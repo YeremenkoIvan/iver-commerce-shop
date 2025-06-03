@@ -15,6 +15,18 @@ export class UsersService {
     return this.userRepository.find();
   }
 
+  async getProfile(userId: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async createUser(userData: Partial<User>): Promise<User> {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
@@ -52,6 +64,31 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
+  async updateProfile(
+    userId: number,
+    updateData: Partial<User>,
+  ): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (updateData.firstName !== undefined) {
+      user.firstName = updateData.firstName;
+    }
+
+    if (updateData.lastName !== undefined) {
+      user.lastName = updateData.lastName;
+    }
+
+    if (updateData.role !== undefined) {
+      user.role = updateData.role;
+    }
+
+    return this.userRepository.save(user);
+  }
+
   async getRoleById(userId: number): Promise<UserRole> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -62,5 +99,30 @@ export class UsersService {
     }
 
     return user.role;
+  }
+
+  async updateUserByEmail(
+    email: string,
+    updateData: Partial<User>,
+  ): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException(`Користувач з email ${email} не знайдений`);
+    }
+
+    if (updateData.firstName !== undefined) {
+      user.firstName = updateData.firstName;
+    }
+
+    if (updateData.lastName !== undefined) {
+      user.lastName = updateData.lastName;
+    }
+
+    if (updateData.role !== undefined) {
+      user.role = updateData.role;
+    }
+
+    return this.userRepository.save(user);
   }
 }

@@ -13,7 +13,13 @@ export class Orders {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+    default: 0.0,
+  })
   amount: number;
 
   @ManyToOne(() => User, (user) => user.orders)
